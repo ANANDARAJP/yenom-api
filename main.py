@@ -5,9 +5,9 @@ from bson import ObjectId
 from contextlib import asynccontextmanager
 
 from database import connect_to_mongo, close_mongo_connection, get_database
-from database import connect_to_mongo, close_mongo_connection, get_database
 from contact import router as contact_router
 from career import router as career_router
+from lead import router as lead_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -26,6 +26,7 @@ app = FastAPI(
 
 app.include_router(contact_router.router, prefix="/contact-us", tags=["Contact Us"])
 app.include_router(career_router.router, prefix="/api/careers", tags=["Careers"])
+app.include_router(lead_router.router, prefix="/lead", tags=["Leads"])
 
 
 

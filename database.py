@@ -17,4 +17,4 @@ async def close_mongo_connection():
         print("Closed MongoDB connection")
 
 def get_database():
-    return db.client.yenom
+    return db.client.yenom_db
