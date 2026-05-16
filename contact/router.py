@@ -5,7 +5,7 @@ from contact import crud, schemas
 
 router = APIRouter()
 
-@router.post("/", summary="Submit Contact Us Form")
+@router.post("/", summary="Submit Contact Us Form", description="Submit a new contact us form with name, email, phone, service, and message.")
 async def create_contact_us(
     contact_us: schemas.ContactUsCreate, 
     db: AsyncIOMotorDatabase = Depends(get_database)
@@ -13,11 +13,11 @@ async def create_contact_us(
     await crud.create_contact_us(db, contact_us)
     return {"message": "Contact us form submitted successfully"}
 
-@router.get("/", summary="Get All Contact Us Submissions")
+@router.get("/", summary="Get All Contact Us Submissions", description="Retrieve all contact us submissions from the database.")
 async def get_all_contact_us(db: AsyncIOMotorDatabase = Depends(get_database)):
     return await crud.get_all_contact_us(db)
 
-@router.get("/{index}", summary="Get Contact Us Submission by Index")
+@router.get("/{index}", summary="Get Contact Us Submission by Index", description="Retrieve a specific contact us submission using its numeric index.")
 async def get_contact_us_by_index(index: str, db: AsyncIOMotorDatabase = Depends(get_database)):
     result = await crud.get_contact_us_by_index(db, index)
     if result is None:

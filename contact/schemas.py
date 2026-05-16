@@ -1,7 +1,8 @@
 from pydantic import BaseModel, EmailStr
 
 class ContactUsCreate(BaseModel):
-    full_name: str
+    name: str
     email: EmailStr
-    subject: str
+    phone: str
+    service: str
     message: str

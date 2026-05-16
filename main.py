@@ -1,13 +1,12 @@
 import os
 from fastapi import FastAPI, HTTPException, Depends
+from fastapi.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from bson import ObjectId
 from contextlib import asynccontextmanager
 
 from database import connect_to_mongo, close_mongo_connection, get_database
 from contact import router as contact_router
-from career import router as career_router
-from lead import router as lead_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -18,18 +17,24 @@ async def lifespan(app: FastAPI):
     await close_mongo_connection()
 
 app = FastAPI(
-    title="Yenom Market API",
-    description="API for Yenom Market Contact Us and Careers forms",
-    version="1.0.0",
+    title="FTDS API",
+    
+    version="1.0.1",
     lifespan=lifespan
 )
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 app.include_router(contact_router.router, prefix="/contact-us", tags=["Contact Us"])
-app.include_router(career_router.router, prefix="/api/careers", tags=["Careers"])
-app.include_router(lead_router.router, prefix="/lead", tags=["Leads"])
 
 
-
+        
 @app.get("/", tags=["Health"])
 async def health_check():
-    return {"status": "ok", "message": "Yenom API is running"}
+    return {"status": "ok", "message": "FTDS API is running"}
