@@ -1,25 +1,35 @@
-from motor.motor_asyncio import AsyncIOMotorDatabase
-from contact.schemas import ContactUsCreate
+from datetime import datetime
+from bson import ObjectId
 
-async def create_contact_us(db: AsyncIOMotorDatabase, contact_us: ContactUsCreate):
-    contact_dict = contact_us.model_dump()
-    doc = await db.ftds_contact_us.find_one({"is_main": True})
-    
-    if not doc:
-        await db.ftds_contact_us.insert_one({"is_main": True, "0": contact_dict})
-    else:
-        keys = [int(k) for k in doc.keys() if k.isdigit()]
-        next_index = str(max(keys) + 1 if keys else 0)
-        await db.ftds_contact_us.update_one({"is_main": True}, {"$set": {next_index: contact_dict}})
+COLLECTION_NAME = "contact_us"
 
-async def get_all_contact_us(db: AsyncIOMotorDatabase):
-    doc = await db.ftds_contact_us.find_one({"is_main": True})
-    if not doc:
-        return {}
-    return {k: v for k, v in doc.items() if k.isdigit()}
+async def create_contact_us(db, contact_us):
+    contact_data = {
+        "name": contact_us.name,
+        "email": contact_us.email,
+        "phone": contact_us.phone,
+        "service": contact_us.service,
+        "message": contact_us.message,
+        "created_at": datetime.utcnow()
+    }
+    result = await db[COLLECTION_NAME].insert_one(contact_data)
+    return str(result.inserted_id)
 
-async def get_contact_us_by_index(db: AsyncIOMotorDatabase, index: str):
-    doc = await db.ftds_contact_us.find_one({"is_main": True})
-    if not doc or index not in doc:
+async def get_all_contact_us(db):
+    contacts = []
+    async for contact in db[COLLECTION_NAME].find():
+        contact["_id"] = str(contact["_id"])
+        contacts.append(contact)
+    return contacts
+
+async def get_contact_us_by_index(db, index: str):
+    try:
+        idx = int(index)
+        # Using skip and limit for efficient indexing
+        cursor = db[COLLECTION_NAME].find().skip(idx).limit(1)
+        async for contact in cursor:
+            contact["_id"] = str(contact["_id"])
+            return contact
         return None
-    return doc[index]
+    except (ValueError, TypeError):
+        return None

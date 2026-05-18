@@ -1,4 +1,7 @@
+# contact/schemas.py
+
 from pydantic import BaseModel, EmailStr
+
 
 class ContactUsCreate(BaseModel):
     name: str
